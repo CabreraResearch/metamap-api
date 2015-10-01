@@ -1,5 +1,5 @@
 # Service name (a combination of lower case letters, numbers, and dashes)
-name: stackhut
+name: metamap
 
 # Service description
 description: Awesome service in nodejs
