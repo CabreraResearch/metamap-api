@@ -1,7 +1,7 @@
 {
     "service": "somecallmechief/metamap",
     "request": {
-        "method": "isAuthenticated",
-        "params": ["eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"]
+        "method": "hello",
+        "params": ["world"]
     }
 }

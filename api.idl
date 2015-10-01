@@ -1,4 +1,9 @@
-interface MetaMap {
+interface Default {
+    
+    //Hello world
+    hello(world string) string
+   
     // determine if the sessionId is authenticated
     isAuthenticated(sessionId string) bool
+   
 }

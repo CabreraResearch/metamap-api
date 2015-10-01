@@ -1,0 +1,9 @@
+{
+    "request": {
+        "method": "hello",
+        "params": [
+            "world"
+        ]
+    },
+    "service": "somecallmechief/metamap"
+}
