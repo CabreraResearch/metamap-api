@@ -1,7 +1,0 @@
-{
-    "service": "somecallmechief/stackhut",
-    "request": {
-        "method": "add",
-        "params": [1, 2]
-    }
-}
