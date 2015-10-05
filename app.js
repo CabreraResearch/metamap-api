@@ -50,4 +50,4 @@ app.post('/isAuthenticated', function (req, res) {
   
 });
 
-let server = app.listen('8000');
+let server = app.listen('80');
