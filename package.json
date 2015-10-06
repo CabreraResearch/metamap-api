@@ -5,11 +5,12 @@
   "dependencies": {
     "auth0": "^0.8.2",
     "body-parser": "^1.14.1",
-    "express": "^4.13.3"
+    "express": "^4.13.3",
+    "firebase": "^2.3.1",
+    "lodash": "^3.10.1"
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node --harmony app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "somecallmechief",
@@ -17,6 +18,7 @@
   "keywords": [],
   "description": "",
   "engines": {
-    "node": "4.1.x"
+    "node": "4.1.x",
+    "npm": "3.3.x"
   }
 }
