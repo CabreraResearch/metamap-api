@@ -34,7 +34,8 @@ var allowCrossDomain = function(req, res, next) {
 app.use('*', allowCrossDomain);
 
 app.use(function (req, res, next) {
-  console.log('Time: %d', Date.now());
+  console.log('Request received: ' + req.url);
+  console.log('Time: %d', new Date());
   next();
 })
 
@@ -95,7 +96,13 @@ app.post('/users/find', (req, res) => {
           let find = (obj, search) => {
             let match = false;
             _.each(obj, (val, key) => {
-              if(val === search || (_.contains(key, 'name') && val.toLowerCase()==search.toLowerCase())) {
+              let oVal = val+''.toLowerCase();
+              let oSearch = search+''.toLowerCase();
+              if(val === search || ( 
+                  _.contains(key, 'name') && 
+                  (oVal==oSearch || _.contains(oVal, oSearch))
+                )
+              ) {
                   match = true;
               } else if(_.isObject(val) || _.isArray(val)) {
                   match = find(val, search);
@@ -121,11 +128,11 @@ app.post('/users/find', (req, res) => {
         res.send(ret)
       
       } catch(err) {
-        res.status('400').send(err);
+        res.status('400').json(err);
       }
     })
     .catch((err)=>{ 
-      res.status('400').send(err);
+      res.status('400').json(err);
     });
   
 })
