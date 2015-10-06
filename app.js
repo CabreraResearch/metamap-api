@@ -91,13 +91,20 @@ app.post('/users/find', (req, res) => {
     .then((val)=>{ 
       try {
         let ret = []
-        let userArr = _.toArray(users);
+        let currentUserId = req.body.currentUserId;
+        let userArr = _.map(users, (u, id) => {
+          if(id==currentUserId) {
+            return {}
+          } else {
+            return u.identity
+          }
+        });
         if(userArr.length > 0) {
           let find = (obj, search) => {
             let match = false;
             _.each(obj, (val, key) => {
-              let oVal = val+''.toLowerCase();
-              let oSearch = search+''.toLowerCase();
+              let oVal = (val+'').toLowerCase();
+              let oSearch = (search+'').toLowerCase();
               if(val === search || ( 
                   _.contains(key, 'name') && 
                   (oVal==oSearch || _.contains(oVal, oSearch))
@@ -117,11 +124,11 @@ app.post('/users/find', (req, res) => {
             return find(u, req.body.search)
           }), (u) => {
             return {
-              id: u.identity.firebase_data.uid,
-              lastName: u.identity.family_name,
-              firstName: u.identity.given_name,
-              picture: u.identity.picture,
-              name: u.identity.name
+              id: u.firebase_data.uid,
+              lastName: u.family_name,
+              firstName: u.given_name,
+              picture: u.picture,
+              name: u.name
             }
           });
         }
