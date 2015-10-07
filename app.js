@@ -22,6 +22,7 @@ app.use(bodyParser.json())       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({  // to support URL-encoded bodies
   extended: true
 })) 
+app.enable('trust proxy')
 
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -34,8 +35,8 @@ var allowCrossDomain = function(req, res, next) {
 app.use('*', allowCrossDomain);
 
 app.use(function (req, res, next) {
-  console.log('Request received: ' + req.url);
-  console.log('Time: %d', new Date());
+  console.log('Request received: ' + req.url + ', from ' + req.ip);
+  console.log('Time: ', new Date().toString());
   next();
 })
 
@@ -44,56 +45,54 @@ app.get('/', function (req, res) {
   res.send('Hello World!');
 });
 
-const isAuthenticated = (sessionId) => {
+const authMatches = {};
+
+const isAuthenticated = (req) => {
+   let sessionId = req.body.sessionId;
    return new Promise((resolve, reject) => {
-    Auth0.getUserInfo(
-    { 
-      domain: 'metamap.auth0.com',
-      userAccessToken: sessionId
-    },
-    (err, profile) => {
-      if (err) {
-          reject(err);
-      } else {
-          resolve(true);
-      }
-  });
-     
+    if(authMatches[req.ip] === sessionId) {
+      resolve(true);
+    } else {
+      Auth0.getUserInfo(
+      { 
+        domain: 'metamap.auth0.com',
+        userAccessToken: sessionId
+      },
+      (err, profile) => {
+        if (err) {
+            reject(err);
+        } else {
+            authMatches[req.ip] = sessionId;
+            resolve(true);
+        }
+      });
+    }
    })
-}
-let api = null;
-const getApi = (accessToken) => {
-  api = api || new Auth0({
-    domain:       'metamap.auth0.com',
-    clientID:     'VA5rA5k4JhlwPxq5ZISVMKpsQ0CSF4d1',
-    clientSecret: 'YP73LT_ii5EtZbD51gJbKpeb_JrA4jgfbS0ZITmSgxZd',
-    accessToken: 'X0tlyXdmbOV6YepaxTfQ5EkIp0bgNhJSd3msv83TxakX9GjHN0nqgkPZiSLI6R5o'
-  });
-  api.options.accessToken = api.options.accessToken || 'X0tlyXdmbOV6YepaxTfQ5EkIp0bgNhJSd3msv83TxakX9GjHN0nqgkPZiSLI6R5o';
-  return api; 
 }
 
 app.post('/isAuthenticated', (req, res) => {
   console.log('Request received: ' + req.url);
   console.log(req.body);
   
-  isAuthenticated(req.body.sessionId)
+  isAuthenticated(req)
     .then((val)=>{
       res.send(val);
     })
     .catch((err)=>{
+      console.error(err)
       res.status('400').send(err);
     });
 });
 
 app.post('/users/find', (req, res) => {
-  isAuthenticated(req.body.sessionId)
+  isAuthenticated(req)
     .then((val)=>{ 
       try {
         let ret = []
-        let currentUserId = req.body.currentUserId;
+        let currentUserId = req.body.currentUserId || '';
+        let excluded = req.body.excludedUsers || [];
         let userArr = _.map(users, (u, id) => {
-          if(id==currentUserId) {
+          if(id==currentUserId || _.contains(excluded, id)) {
             return {}
           } else {
             return u.identity
@@ -135,10 +134,12 @@ app.post('/users/find', (req, res) => {
         res.send(ret)
       
       } catch(err) {
+        console.error(err)
         res.status('400').json(err);
       }
     })
     .catch((err)=>{ 
+      console.error(err)
       res.status('400').json(err);
     });
   
