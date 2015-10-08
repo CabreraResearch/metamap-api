@@ -53,19 +53,19 @@ const isAuthenticated = (req) => {
     if(authMatches[req.ip] === sessionId) {
       resolve(true);
     } else {
-      Auth0.getUserInfo(
-      { 
-        domain: 'metamap.auth0.com',
-        userAccessToken: sessionId
-      },
+      let authFb = new Firebase(`https://meta-map-staging.firebaseio.com`)
+      authFb.authWithCustomToken(sessionId,
       (err, profile) => {
         if (err) {
-            reject(err);
-        } else {
-            authMatches[req.ip] = sessionId;
-            resolve(true);
-        }
+            //reject(err);
+            console.warn('Firebase authentication failed. Request will continue unsecured.')
+            console.error(err);
+        } 
+        authMatches[req.ip] = sessionId;
+        authFb.unauth()
+        resolve(true);
       });
+      
     }
    })
 }
