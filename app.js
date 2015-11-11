@@ -7,7 +7,6 @@ const Auth0 = require('auth0');
 const Firebase = require('firebase');
 const _ = require('lodash');
 const fs = require('fs')
-
 const ref = new Firebase(`https://meta-map-staging.firebaseio.com/`);
 
 ref.authWithCustomToken('Gax7TXdhlVnR16k2ZBhsnSDvMt8FfFEiHExRURoC', (err) => {
@@ -15,17 +14,21 @@ ref.authWithCustomToken('Gax7TXdhlVnR16k2ZBhsnSDvMt8FfFEiHExRURoC', (err) => {
 });
 
 const saveOnceADay = _.throttle((data) => {
-  if(!fs.exists(__dirname +'/backups')) {
-    fs.mkdir(__dirname +'/backups')
-  }
-  let date = new Date()
-  let filename = __dirname + '/backups/'+_.kebabCase(date.toDateString()+'-'+date.toTimeString())+'.json'
-  fs.writeFile(filename, JSON.stringify(data), (err) => {
-    if(err) {
-      throw err
+  fs.exists(__dirname +'/backups', (exists) => {
+    if(!exists) {
+      fs.mkdir(__dirname +'/backups')
     }
-    console.log('Successfully backup up MetaMap to ' + filename)
-  })
+  }) 
+  let date = new Date()
+  let filename = __dirname + '/backups/'+_.kebabCase(date.toDateString()+'-'+date.toTimeString()+'-'+date.getTime())+'.json'
+  if(!fs.exists(filename)) {
+    fs.writeFile(filename, JSON.stringify(data), (err) => {
+      if(err) {
+        //throw err
+      }
+      console.log('Successfully backup up MetaMap to ' + filename)
+    })
+  }
 }, 12*60*60*1000)
 
 ref.on('value', (snap) => {
