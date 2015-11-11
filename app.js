@@ -6,15 +6,34 @@ const app = express()
 const Auth0 = require('auth0');
 const Firebase = require('firebase');
 const _ = require('lodash');
+const fs = require('fs')
 
-const ref = new Firebase(`https://meta-map-staging.firebaseio.com/users`);
+const ref = new Firebase(`https://meta-map-staging.firebaseio.com/`);
 
 ref.authWithCustomToken('Gax7TXdhlVnR16k2ZBhsnSDvMt8FfFEiHExRURoC', (err) => {
   console.error(err);
 });
 
-let users = [];
+const saveOnceADay = _.throttle((data) => {
+  if(!fs.exists(__dirname +'/backups')) {
+    fs.mkdir(__dirname +'/backups')
+  }
+  let date = new Date()
+  let filename = __dirname + '/backups/'+_.kebabCase(date.toDateString()+'-'+date.toTimeString())+'.json'
+  fs.writeFile(filename, JSON.stringify(data), (err) => {
+    if(err) {
+      throw err
+    }
+    console.log('Successfully backup up MetaMap to ' + filename)
+  })
+}, 12*60*60*1000)
+
 ref.on('value', (snap) => {
+  saveOnceADay(snap.val())
+})
+
+let users = [];
+ref.child('users').on('value', (snap) => {
   users = snap.val();
 })
 
