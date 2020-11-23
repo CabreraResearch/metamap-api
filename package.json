@@ -6,7 +6,7 @@
     "auth0": "^2.0.0",
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
-    "firebase": "^2.3.1",
+    "firebase": "^8.0.0",
     "lodash": "^3.10.1"
   },
   "devDependencies": {},
