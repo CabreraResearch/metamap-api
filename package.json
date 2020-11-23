@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "dependencies": {
-    "auth0": "^0.8.2",
+    "auth0": "^2.0.0",
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
     "firebase": "^2.3.1",
