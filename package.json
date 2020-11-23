@@ -19,7 +19,7 @@
   "keywords": [],
   "description": "",
   "engines": {
-    "node": "4.1.x",
+    "node": "4.9.x",
     "npm": "3.10.x"
   }
 }
