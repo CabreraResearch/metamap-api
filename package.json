@@ -20,6 +20,6 @@
   "description": "",
   "engines": {
     "node": "4.1.x",
-    "npm": "3.3.x"
+    "npm": "3.10.x"
   }
 }
